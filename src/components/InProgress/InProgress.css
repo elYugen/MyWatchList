@@ -1,0 +1,48 @@
+.inProgress {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  overflow-x: auto;
+  white-space: nowrap; 
+  max-width: 100%;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.inProgress::-webkit-scrollbar {
+  display: none;
+}
+
+.inProgressCard {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.inProgressTitle {
+  font-weight: 400;
+  max-width: 100%;
+  margin-top: 10px;
+}
+
+.inProgressTitle p {
+  margin: 0;
+  word-break: break-word;
+  white-space: normal;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.inProgressRecap {
+  display: flex;
+  justify-content: space-between;
+  max-width: 80%;
+  font-weight: 400;
+  color: #91949c;
+}
+
+.inProgressCardImage img {
+  border-radius: 15px;
+  width: 150px;
+  height: 200px;
+}

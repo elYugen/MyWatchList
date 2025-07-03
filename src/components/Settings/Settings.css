@@ -1,0 +1,32 @@
+.settings {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.settings a {
+  color: white;
+}
+
+.settings h5 {
+  margin-top: -10px;
+}
+
+.settingsOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+   width: 100%;
+}
+
+.settingsOptionsLink {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+#file-input {
+  display: none; 
+}

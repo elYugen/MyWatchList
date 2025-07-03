@@ -1,0 +1,50 @@
+.header {
+  display: flex;
+  flex-direction: row;   
+  margin: 15px;
+  gap: 20px;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  z-index: 10;
+}
+
+.headerYou {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+}
+
+.headerYou p {
+  font-size: 16px;
+}
+
+.headerLogo {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  object-fit: cover;
+  overflow: hidden;  
+  display: flex;
+}
+
+.headerSettings {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  object-fit: cover;
+  overflow: hidden;  
+  background-color: #2d3240;
+  font-size: 24px;
+  color: #2eaebf;
+  box-shadow: 0 0 18px 1px rgba(46, 174, 191, 0.2);
+}
+
+.headerSettings a {
+  color: inherit;
+  text-decoration: none; 
+}

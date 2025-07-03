@@ -1,0 +1,76 @@
+.anime-item {
+  display: flex;
+  margin-bottom: 20px;
+  background-color: #2d3240;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.anime-image {
+  width: 100px;
+  height: auto;
+  margin-right: 10px;
+}
+
+.anime-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.anime-details h3 {
+  margin: 0 0 10px 0;
+}
+
+.anime-details label {
+  margin-right: 10px;
+}
+
+.anime-choice {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.prevBtn, .nextBtn {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  margin: 0 10px;
+}
+
+.prevBtn:disabled, .nextBtn:disabled {
+  background-color: grey;
+  cursor: not-allowed;
+}
+
+.pagination-number {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: none;
+  border: none;
+  color: white;
+  text-decoration: none;
+}
+
+.pagination-number:hover {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.pagination-number.active {
+  font-weight: bold;
+  color: #007bff;
+}

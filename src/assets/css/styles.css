@@ -1,0 +1,134 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&display=swap');
+
+body {
+    background-color: #1b1e26;
+    color: white;
+    font-family: Raleway;
+}
+
+li {
+    list-style-type: none;
+}
+
+a {
+    text-decoration: none;
+    color: white;
+}
+
+.nopage {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    flex-direction: column;
+}
+
+select {
+  background-color: #1b1e26;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: 1px solid #2e2e2e;
+  font-size: 16px;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+select:focus {
+    outline: none;
+    border-color: rgba(46, 174, 191, 0.2);
+    box-shadow: 0 0 0 3px rgba(46, 174, 191, 0.1);
+  }
+
+.container {
+    display: flex;
+    flex-direction: column;
+    margin: 20px;
+    gap: 10px;
+    padding-bottom: 60px;
+}
+
+.loading {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.categoriesTitle {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.categoriesTitle h3 {
+  font-weight: 400;
+}
+
+.pagesTitle {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+}
+
+.pagesTitle h3 {
+  font-weight: 400;
+}
+
+/* Barre de scroll */
+/* Pour les navigateurs basés sur WebKit (comme Chrome, Safari) */
+::-webkit-scrollbar {
+    width: 12px; /* Largeur de la barre de défilement */
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: #1b1e26; /* Couleur de fond */
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background-color: #3a3f50; /* Couleur de la barre de défilement, plus clair */
+    border-radius: 6px; /* Coins arrondis */
+    border: 2px solid #1b1e26; /* Pour créer un peu d'espace autour de la barre */
+  }
+  
+  /* Pour Firefox */
+  * {
+    scrollbar-width: thin; /* Barre de défilement plus fine */
+    scrollbar-color: #3a3f50 #1b1e26; /* Couleur de la barre et de la piste */
+  }
+  
+
+/* Barre de recherche */
+.searchBar {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+
+.searchBar input {
+    background-color: #2d3240;
+    width: 100%;
+    height: 40px;
+    border-radius: 15px;
+    border: 2px solid transparent;
+    padding-left: 40px;
+    padding-right: 40px; 
+    color: #91949c;
+    transition: border-color 0.3s ease; 
+}
+  
+.searchBar input:focus {
+    outline: none; 
+    border-color: rgba(46, 174, 191, 0.2); 
+    box-shadow: 0 0 0 3px rgba(46, 174, 191, 0.1); 
+}
+  
+.searchContainer {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+}

@@ -1,0 +1,48 @@
+.toSee {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  overflow-x: auto;
+  white-space: nowrap; 
+  max-width: 100%;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.toSee::-webkit-scrollbar {
+  display: none;
+}
+
+.toSeeCard {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.toSeeTitle {
+  font-weight: 400;
+  max-width: 100%;
+  margin-top: 10px;
+}
+
+.toSeeTitle p {
+  margin: 0;
+  word-break: break-word;
+  white-space: normal;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.toSeeRecap {
+  display: flex;
+  justify-content: space-between;
+  max-width: 80%;
+  font-weight: 400;
+  color: #91949c;
+}
+
+.toSeeCardImage img {
+  border-radius: 15px;
+  width: 150px;
+  height: 200px;
+}
