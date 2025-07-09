@@ -12,8 +12,8 @@ export default defineConfig({
         name: 'WatchList',
         short_name: 'AppAnime',
         description: 'Gère ta watchlist d’anime et de films',
-        theme_color: '#22223b',
-        background_color: '#fff',
+        theme_color: '#1b1e26',
+        background_color: '#1b1e26',
         display: 'standalone',
         start_url: '/',
         icons: [
