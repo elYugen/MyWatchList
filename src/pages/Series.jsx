@@ -24,7 +24,7 @@ function Series() {
       }
 
       const data = await response.json();
-      const seriesOnly = data.filter(item => item.type === 'serie');
+      const seriesOnly = data.filter(item => item.type === 'serie'  && item.statut === 'tosee');
       setSeriesToSee(seriesOnly);
     } catch (error) {
       console.error('Erreur API :', error);

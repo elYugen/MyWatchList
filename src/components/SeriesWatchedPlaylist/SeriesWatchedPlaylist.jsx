@@ -40,11 +40,23 @@ function SeriesWatchedPlaylist() {
     fetchItemsFromAPI();
   };
 
-  // const handleRemoveSerie = (name) => {
-  //   const updatedItems = itemsWatched.filter(item => item.name !== name);
-  //   setItemsWatched(updatedItems);
-  //   localStorage.setItem('ItemsWatched', JSON.stringify(updatedItems));
-  // };
+  const handleRemoveSerie = async (id) => {
+    const uuid = localStorage.getItem('watchlist_uuid');
+    try {
+      const response = await fetch(`http://localhost:8000/api/watchlist/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'X-User-UUID': uuid
+        }
+      });
+
+      if (!response.ok) throw new Error("Erreur lors de la suppression");
+
+      await fetchItemsFromAPI(); 
+    } catch (error) {
+      console.error('Erreur API suppression :', error);
+    }
+  };
 
   const indexOfLastSeries = currentPage * seriesPerPage;
   const indexOfFirstSeries = indexOfLastSeries - seriesPerPage;
@@ -68,7 +80,7 @@ function SeriesWatchedPlaylist() {
             <div className="anime-details">
               <h3>{serie.name}</h3>
               <div className="anime-actions">
-                <button className="trash-button" onClick={() => handleRemoveSerie(serie.name)}>
+                <button className="trash-button" onClick={() => handleRemoveSerie(serie.id)}>
                   <i className="bi bi-trash"></i>
                 </button>
               </div>

@@ -23,7 +23,7 @@ const [itemsWatched, setItemsWatched] = useState([]);
       }
 
       const data = await response.json();
-      const movieOnly = data.filter(item => item.type === 'movie' && item.statut === 'inprogress');
+      const movieOnly = data.filter(item => item.type === 'movie' && item.statut === 'watched');
       setItemsWatched(movieOnly);
     } catch (error) {
       console.error('Erreur API :', error);

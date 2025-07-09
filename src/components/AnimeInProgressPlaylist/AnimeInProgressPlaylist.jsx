@@ -40,28 +40,66 @@ function AnimeInProgressPlaylist() {
     fetchItemsFromAPI();
   };
 
-  const handleRemoveAnime = (name) => {
-    const updatedAnimes = itemsInProgress.filter((anime) => anime.name !== name);
-    setItemsInProgress(updatedAnimes);
-    localStorage.setItem('ItemsInProgress', JSON.stringify(updatedAnimes));
+  const handleRemoveAnime = async (id) => {
+    const uuid = localStorage.getItem('watchlist_uuid');
+    try {
+      const response = await fetch(`http://localhost:8000/api/watchlist/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'X-User-UUID': uuid
+        }
+      });
+
+      if (!response.ok) throw new Error("Erreur lors de la suppression");
+
+      await fetchItemsFromAPI(); 
+    } catch (error) {
+      console.error('Erreur API suppression :', error);
+    }
   };
 
-  const handleMarkAsSeen = (anime) => {
-    const watchedAnimes = JSON.parse(localStorage.getItem('ItemsWatched')) || [];
-    localStorage.setItem('ItemsWatched', JSON.stringify([...watchedAnimes, anime]));
-    handleRemoveAnime(anime.name);
-  };
 
-  const handleEpisodeChange = (name, episode) => {
-    const updatedAnimes = itemsInProgress.map((anime) => {
-      if (anime.name === name) {
-        return { ...anime, episode };
-      }
-      return anime;
+const handleEpisodeChange = async (id, episode) => {
+  const uuid = localStorage.getItem('watchlist_uuid');
+  try {
+    const response = await fetch(`http://localhost:8000/api/watchlist/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-User-UUID': uuid
+      },
+      body: JSON.stringify({ episode })
     });
-    setItemsInProgress(updatedAnimes);
-    localStorage.setItem('ItemsInProgress', JSON.stringify(updatedAnimes));
+
+    if (!response.ok) throw new Error("Erreur lors de la mise à jour");
+
+    await fetchItemsFromAPI(); 
+  } catch (error) {
+    console.error('Erreur API mise à jour épisode :', error);
+  }
+};
+
+
+  const handleMarkAsSeen = async (anime) => {
+    const uuid = localStorage.getItem('watchlist_uuid');
+    try {
+      const response = await fetch(`http://localhost:8000/api/watchlist/${anime.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-User-UUID': uuid
+        },
+        body: JSON.stringify({ statut: 'watched' })
+      });
+
+      if (!response.ok) throw new Error("Erreur lors du changement de statut");
+
+      await fetchItemsFromAPI(); 
+    } catch (error) {
+      console.error('Erreur API mark as seen :', error);
+    }
   };
+
 
   const indexOfLastAnime = currentPage * animesPerPage;
   const indexOfFirstAnime = indexOfLastAnime - animesPerPage;
@@ -79,6 +117,7 @@ function AnimeInProgressPlaylist() {
     <AnimeSearchBar statut="inprogress" onAnimeAdded={handleAnimeAdded}/>
     {currentAnimes.length > 0 ? (
         currentAnimes.map((anime) => (
+          
           <div className="anime-item" key={anime.name}>
             <img src={anime.image} alt={anime.name} className="anime-image" />
             <div className="anime-details">
@@ -86,7 +125,7 @@ function AnimeInProgressPlaylist() {
               <div className="anime-actions">
                 <div className="anime-choice">
                   <label htmlFor={`${anime.name}-episode`}>Épisode : </label>
-                  <select id={`${anime.name}-episode`} value={anime.episode} onChange={(e) => handleEpisodeChange(anime.name, e.target.value)}>
+                  <select id={`${anime.name}-episode`} value={anime.episode} onChange={(e) => handleEpisodeChange(anime.id, e.target.value)}>
                     {[...Array(anime.total_episodes).keys()].map((index) => (
                       <option key={index + 1} value={index + 1}>
                         Épisode {index + 1}
@@ -94,7 +133,7 @@ function AnimeInProgressPlaylist() {
                     ))}
                   </select>
                 </div>
-                <button className="trash-button" onClick={() => handleRemoveAnime(anime.name)}>
+                <button className="trash-button" onClick={() => handleRemoveAnime(anime.id)}>
                   <i className="bi bi-trash"></i>
                 </button>
                 <button className="seen-button" onClick={() => handleMarkAsSeen(anime)}>

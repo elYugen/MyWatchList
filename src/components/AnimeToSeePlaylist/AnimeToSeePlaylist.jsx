@@ -40,48 +40,42 @@ function AnimeToSeePlaylist() {
     fetchItemsFromAPI();
   };
 
-  const handleRemoveAnime = (name) => {
-    const updatedItems = itemsToSee.filter(item => item.name !== name);
-    setItemsToSee(updatedItems);
+  const handleRemoveAnime = async (id) => {
+    const uuid = localStorage.getItem('watchlist_uuid');
+    try {
+      const response = await fetch(`http://localhost:8000/api/watchlist/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'X-User-UUID': uuid
+        }
+      });
 
-    // met à jour le localStorage "ItemsToSee" globalement (avec tous les types)
-    const allItems = JSON.parse(localStorage.getItem('ItemsToSee')) || [];
-    const filteredAllItems = allItems.filter(item => item.name !== name);
-    localStorage.setItem('ItemsToSee', JSON.stringify(filteredAllItems));
-  };
+      if (!response.ok) throw new Error("Erreur lors de la suppression");
 
-  // marquer comme vu (déplacer vers ItemsWatched)
-  const handleMarkAsSeen = (anime) => {
-    const watchedItems = JSON.parse(localStorage.getItem('ItemsWatched')) || [];
-    localStorage.setItem('ItemsWatched', JSON.stringify([...watchedItems, anime]));
-    handleRemoveAnime(anime.name);
+      await fetchItemsFromAPI(); 
+    } catch (error) {
+      console.error('Erreur API suppression :', error);
+    }
   };
 
   // déplacer dans ItemsInProgress
   const handleMoveToInProgress = async (anime) => {
+    const uuid = localStorage.getItem('watchlist_uuid');
     try {
-      const response = await fetch(`https://api.jikan.moe/v4/anime/${anime.mal_id}`);
-      if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
+      const response = await fetch(`http://localhost:8000/api/watchlist/${anime.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-User-UUID': uuid
+        },
+        body: JSON.stringify({ statut: 'inprogress' })
+      });
 
-      const data = await response.json();
+      if (!response.ok) throw new Error("Erreur lors du changement de statut");
 
-      const newAnime = {
-        mal_id: anime.mal_id,
-        name: anime.name || data.data.title,
-        image: data.data.images.jpg.image_url || 'default-image-url.jpg',
-        total_episodes: data.data.episodes || 0,
-        season: '', 
-        episode: '1', 
-        type: 'anime',
-      };
-
-      const inProgressItems = JSON.parse(localStorage.getItem('ItemsInProgress')) || [];
-      localStorage.setItem('ItemsInProgress', JSON.stringify([...inProgressItems, newAnime]));
-
-      handleRemoveAnime(anime.name);
-      alert(`${anime.name} a été déplacé vers "Anime en cours" !`);
+      await fetchItemsFromAPI(); 
     } catch (error) {
-      console.error('Erreur lors de la récupération des détails de l\'anime:', error);
+      console.error('Erreur API mark as seen :', error);
     }
   };
 
@@ -115,7 +109,7 @@ function AnimeToSeePlaylist() {
             <div className="anime-details">
               <h3>{anime.name}</h3>
               <div className="anime-actions">
-                <button className="trash-button" onClick={() => handleRemoveAnime(anime.name)}>
+                <button className="trash-button" onClick={() => handleRemoveAnime(anime.id)}>
                   <i className="bi bi-trash"></i>
                 </button>
                 <button className="in-progress-button" onClick={() => handleMoveToInProgress(anime)}>

@@ -24,7 +24,7 @@ function Anime() {
       }
 
       const data = await response.json();
-      const animesOnly = data.filter(item => item.type === 'anime');
+      const animesOnly = data.filter(item => item.type === 'anime' && item.statut === 'tosee');
       setAnimesToSee(animesOnly);
     } catch (error) {
       console.error('Erreur API :', error);

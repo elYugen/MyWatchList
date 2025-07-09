@@ -25,7 +25,7 @@ function MovieToSeePlaylist() {
       }
 
       const data = await response.json();
-      const moviesOnly = data.filter(item => item.type === 'movie');
+      const moviesOnly = data.filter(item => item.type === 'movie' && item.statut === 'tosee');
       setItemsToSee(moviesOnly);
     } catch (error) {
       console.error('Erreur API :', error);
@@ -40,21 +40,42 @@ function MovieToSeePlaylist() {
     fetchItemsFromAPI();
   };
 
-  const handleRemoveMovie = (name) => {
-    const updatedItems = itemsToSee.filter(item => item.name !== name);
-    setItemsToSee(updatedItems);
+  const handleRemoveMovie = async (id) => {
+    const uuid = localStorage.getItem('watchlist_uuid');
+    try {
+      const response = await fetch(`http://localhost:8000/api/watchlist/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'X-User-UUID': uuid
+        }
+      });
 
-    // met à jour le localStorage "ItemsToSee" globalement (avec tous les types)
-    const allItems = JSON.parse(localStorage.getItem('ItemsToSee')) || [];
-    const filteredAllItems = allItems.filter(item => item.name !== name);
-    localStorage.setItem('ItemsToSee', JSON.stringify(filteredAllItems));
+      if (!response.ok) throw new Error("Erreur lors de la suppression");
+
+      await fetchItemsFromAPI(); 
+    } catch (error) {
+      console.error('Erreur API suppression :', error);
+    }
   };
 
-  // marquer comme vu (déplacer vers ItemsWatched)
-  const handleMarkAsSeen = (movie) => {
-    const watchedItems = JSON.parse(localStorage.getItem('ItemsWatched')) || [];
-    localStorage.setItem('ItemsWatched', JSON.stringify([...watchedItems, movie]));
-    handleRemoveMovie(movie.name);
+  const handleMarkAsSeen = async (movie) => {
+    const uuid = localStorage.getItem('watchlist_uuid');
+    try {
+      const response = await fetch(`http://localhost:8000/api/watchlist/${movie.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-User-UUID': uuid
+        },
+        body: JSON.stringify({ statut: 'watched' })
+      });
+
+      if (!response.ok) throw new Error("Erreur lors du changement de statut");
+
+      await fetchItemsFromAPI(); 
+    } catch (error) {
+      console.error('Erreur API mark as seen :', error);
+    }
   };
 
 
@@ -88,7 +109,7 @@ function MovieToSeePlaylist() {
             <div className="anime-details">
               <h3>{movie.name}</h3>
               <div className="anime-actions">
-                <button className="trash-button" onClick={() => handleRemoveMovie(movie.name)}>
+                <button className="trash-button" onClick={() => handleRemoveMovie(movie.id)}>
                   <i className="bi bi-trash"></i>
                 </button>
                 <button className="seen-button" onClick={() => handleMarkAsSeen(movie)}>

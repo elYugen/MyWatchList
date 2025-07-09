@@ -67,4 +67,40 @@ class WatchlistController extends Controller
         return response()->json($items);
 
     }
+
+    public function destroy($id, Request $request)
+    {
+        $uuid = $request->header('X-User-UUID');
+
+        $item = Watchlist::where('id', $id)->where('uuid', $uuid)->first();
+
+        if (!$item) {
+            return response()->json(['error' => 'Élément introuvable ou non autorisé'], 404);
+        }
+
+        $item->delete();
+
+        return response()->json(['success' => true, 'message' => 'Élément supprimé avec succès']);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $uuid = $request->header('X-User-UUID');
+
+        $item = Watchlist::where('id', $id)->where('uuid', $uuid)->first();
+
+        if (!$item) {
+            return response()->json(['error' => 'Élément introuvable ou non autorisé'], 404);
+        }
+
+        $request->validate([
+            'episode' => 'nullable|integer',
+            'statut' => 'nullable|in:tosee,inprogress,watched'
+
+        ]);
+
+        $item->update($request->only(['episode', 'statut']));
+
+        return response()->json(['success' => true, 'message' => 'Élément mis à jour avec succès', 'item' => $item]);
+    }
 }

@@ -41,26 +41,44 @@ function SeriesInProgressPlaylist() {
     fetchItemsFromAPI();
   };
 
-  const handleRemoveSeries = (name) => {
-    const updatedSeries = itemsInProgress.filter((serie) => serie.name !== name);
-    setItemsInProgress(updatedSeries);
-    localStorage.setItem('ItemsInProgress', JSON.stringify(updatedSeries));
-    logUserAction('REMOVE_SERIE', { name });
+  const handleRemoveSeries = async (id) => {
+    const uuid = localStorage.getItem('watchlist_uuid');
+    try {
+      const response = await fetch(`http://localhost:8000/api/watchlist/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'X-User-UUID': uuid
+        }
+      });
+
+      if (!response.ok) throw new Error("Erreur lors de la suppression");
+
+      await fetchItemsFromAPI(); 
+    } catch (error) {
+      console.error('Erreur API suppression :', error);
+    }
   };
 
-  const handleMarkAsSeen = (serie) => {
-    const watchedSeries = JSON.parse(localStorage.getItem('ItemsWatched')) || [];
-    localStorage.setItem('ItemsWatched', JSON.stringify([...watchedSeries, serie]));
-    handleRemoveSeries(serie.name);
-    logUserAction('MOVE_SERIE', { serie });
+  const handleMarkAsSeen = async (anime) => {
+    const uuid = localStorage.getItem('watchlist_uuid');
+    try {
+      const response = await fetch(`http://localhost:8000/api/watchlist/${anime.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-User-UUID': uuid
+        },
+        body: JSON.stringify({ statut: 'watched' })
+      });
+
+      if (!response.ok) throw new Error("Erreur lors du changement de statut");
+
+      await fetchItemsFromAPI(); 
+    } catch (error) {
+      console.error('Erreur API mark as seen :', error);
+    }
   };
 
-  const handleMarkInProgress = (name) => {
-    localStorage.setItem('ItemsInProgress', JSON.stringify([...watchedItems, serie]));
-    handleRemoveMovie(serie.name);
-    console.log('série ajouter à la playlist en cours');
-    
-  };
 
   const indexOfLastSeries = currentPage * seriesPerPage;
   const indexOfFirstSeries = indexOfLastSeries - seriesPerPage;
@@ -83,10 +101,10 @@ function SeriesInProgressPlaylist() {
             <div className="anime-details">
               <h3>{serie.name}</h3>
               <div className="anime-actions">
-                <button className="trash-button" onClick={() => handleRemoveSeries(serie.name)}>
+                <button className="trash-button" onClick={() => handleRemoveSeries(serie.id)}>
                   <i className="bi bi-trash"></i>
                 </button>
-                <button className="seen-button" onClick={() => handleMarkInProgress(serie)}>
+                <button className="seen-button" onClick={() => handleMarkAsSeen(serie)}>
                   <i className="bi bi-check"></i>
                 </button>
               </div>

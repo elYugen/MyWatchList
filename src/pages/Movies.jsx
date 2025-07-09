@@ -23,7 +23,7 @@ function Movies() {
       }
 
       const data = await response.json();
-      const moviesOnly = data.filter(item => item.type === 'movie');
+      const moviesOnly = data.filter(item => item.type === 'movie' && item.statut === 'tosee');
       setMovieToSee(moviesOnly);
     } catch (error) {
       console.error('Erreur API :', error);
