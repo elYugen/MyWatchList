@@ -15,7 +15,7 @@ function InProgress() {
       try {
         setLoading(true); 
 
-        const res = await fetch('https://watchlist.lleroy.fr/api/watchlist', {
+        const res = await fetch('https://api.watchlist.lleroy.fr/api/watchlist', {
           headers: { 'X-User-UUID': uuid }
         });
 

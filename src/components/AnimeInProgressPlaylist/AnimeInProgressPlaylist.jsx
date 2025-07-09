@@ -13,7 +13,7 @@ function AnimeInProgressPlaylist() {
     if (!uuid) return;
 
     try {
-      const response = await fetch('https://watchlist.lleroy.fr/api/watchlist', {
+      const response = await fetch('https://api.watchlist.lleroy.fr/api/watchlist', {
         method: 'GET',
         headers: {
           'X-User-UUID': uuid
@@ -43,7 +43,7 @@ function AnimeInProgressPlaylist() {
   const handleRemoveAnime = async (id) => {
     const uuid = localStorage.getItem('watchlist_uuid');
     try {
-      const response = await fetch(`https://watchlist.lleroy.fr/api/watchlist/${id}`, {
+      const response = await fetch(`https://api.watchlist.lleroy.fr/api/watchlist/${id}`, {
         method: 'DELETE',
         headers: {
           'X-User-UUID': uuid
@@ -62,7 +62,7 @@ function AnimeInProgressPlaylist() {
 const handleEpisodeChange = async (id, episode) => {
   const uuid = localStorage.getItem('watchlist_uuid');
   try {
-    const response = await fetch(`https://watchlist.lleroy.fr/api/watchlist/${id}`, {
+    const response = await fetch(`https://api.watchlist.lleroy.fr/api/watchlist/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -83,7 +83,7 @@ const handleEpisodeChange = async (id, episode) => {
   const handleMarkAsSeen = async (anime) => {
     const uuid = localStorage.getItem('watchlist_uuid');
     try {
-      const response = await fetch(`https://watchlist.lleroy.fr/api/watchlist/${anime.id}`, {
+      const response = await fetch(`https://api.watchlist.lleroy.fr/api/watchlist/${anime.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
