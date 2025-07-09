@@ -8,25 +8,43 @@ function SeriesWatchedPlaylist() {
   const seriesPerPage = 5;
   const maxPageWindow = 5;
 
-  const loadItemsFromStorage = () => {
-    const storedItems = JSON.parse(localStorage.getItem('ItemsWatched')) || [];
-    const seriesOnly = storedItems.filter(item => item.type === 'serie');
-    setItemsWatched(seriesOnly);
+  const fetchItemsFromAPI = async () => {
+    const uuid = localStorage.getItem('watchlist_uuid');
+    if (!uuid) return;
+
+    try {
+      const response = await fetch('http://localhost:8000/api/watchlist', {
+        method: 'GET',
+        headers: {
+          'X-User-UUID': uuid
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error("Erreur lors du chargement des films");
+      }
+
+      const data = await response.json();
+      const seriesOnly = data.filter(item => item.type === 'serie' && item.statut === 'watched');
+      setItemsWatched(seriesOnly);
+    } catch (error) {
+      console.error('Erreur API :', error);
+    }
   };
 
   useEffect(() => {
-    loadItemsFromStorage();
+    fetchItemsFromAPI();
   }, []);
 
   const handleSerieAdded = () => {
-    loadItemsFromStorage();
+    fetchItemsFromAPI();
   };
 
-  const handleRemoveSerie = (name) => {
-    const updatedItems = itemsWatched.filter(item => item.name !== name);
-    setItemsWatched(updatedItems);
-    localStorage.setItem('ItemsWatched', JSON.stringify(updatedItems));
-  };
+  // const handleRemoveSerie = (name) => {
+  //   const updatedItems = itemsWatched.filter(item => item.name !== name);
+  //   setItemsWatched(updatedItems);
+  //   localStorage.setItem('ItemsWatched', JSON.stringify(updatedItems));
+  // };
 
   const indexOfLastSeries = currentPage * seriesPerPage;
   const indexOfFirstSeries = indexOfLastSeries - seriesPerPage;
@@ -42,7 +60,7 @@ function SeriesWatchedPlaylist() {
 
   return (
     <>
-    <SeriesSearchBar storageKey="ItemsWatched" onSeriesAdded={handleSerieAdded}/>
+    <SeriesSearchBar statut="watched" onSeriesAdded={handleSerieAdded}/>
     {currentSeries.length > 0 ? (
         currentSeries.map((serie) => (
           <div className="anime-item" key={serie.name}>

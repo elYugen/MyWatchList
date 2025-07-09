@@ -7,14 +7,6 @@ function SeriesRandomPick({ onAdd }) {
   const { series, loading, error } = useRandomSeries();
 
   const handleAddToLocalStorage = (serie) => {
-    const storedItems = JSON.parse(localStorage.getItem('ItemsToSee')) || [];
-
-    const exists = storedItems.some(item => item.imdb_id === serie.imdb_id && item.type === 'serie');
-    if (exists) {
-      alert("Cette série est déjà dans la liste !");
-      return;
-    }
-
     const newSerie = {
       imdb_id: serie.imdb_id,
       name: serie.title,
@@ -27,10 +19,33 @@ function SeriesRandomPick({ onAdd }) {
       synopsis: serie.synopsis,
     };
 
-    localStorage.setItem('ItemsToSee', JSON.stringify([...storedItems, newSerie]));
-    alert(`${series.title} a été ajouté à la liste "À voir" !`);
+    const uuid = localStorage.getItem('watchlist_uuid');
+    if (!uuid) {
+      console.error("UUID non trouvé dans le localStorage");
+      return;
+    }
 
-    if (onAdd) onAdd(); 
+  fetch('http://localhost:8000/api/watchlist', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-User-UUID': uuid
+    },
+    body: JSON.stringify(newSerie)
+  })
+    .then(res => {
+      if (!res.ok) throw new Error("Erreur lors de l'enregistrement en base");
+      return res.json();
+    })
+    .then(data => {
+      console.log('Ajouté à la base :', data);
+      alert(`${serie.title} a été ajouté à la playlist "À voir" !`);
+      if (onAdd) onAdd(); // recharge la liste
+    })
+    .catch(err => {
+      console.error('Erreur API:', err);
+      alert("Erreur lors de l'ajout du film !");
+    });
   };
 
   return (

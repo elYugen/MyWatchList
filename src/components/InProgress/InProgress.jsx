@@ -5,15 +5,35 @@ import './InProgress.css';
 function InProgress() {
 
   const [itemsInProgress, setItemsInProgress] = useState([]);
+  const uuid = localStorage.getItem('watchlist_uuid');
+  const [loading, setLoading] = useState(true); 
 
   useEffect(() => {
-    const loadItemsFromStorage = () => {
-      const storedItems = JSON.parse(localStorage.getItem('ItemsInProgress')) || [];
-      setItemsInProgress(storedItems);
+    if (!uuid) return;
+
+    const fetchData = async () => {
+      try {
+        setLoading(true); 
+
+        const res = await fetch('http://localhost:8000/api/watchlist', {
+          headers: { 'X-User-UUID': uuid }
+        });
+
+        if (!res.ok) throw new Error('Erreur lors de la requête');
+
+        const data = await res.json();
+        const filtered = data.filter(item => item.statut === 'inprogress');
+
+        setItemsInProgress(filtered);
+      } catch (error) {
+        console.error('Erreur API :', error);
+      } finally {
+        setLoading(false); 
+      }
     };
 
-    loadItemsFromStorage();
-  }, []);
+    fetchData();
+  }, [uuid]);
 
   return (
     <>
@@ -24,7 +44,11 @@ function InProgress() {
         </div>
       </Link>
       <section className="inProgress">
-        {itemsInProgress.length > 0 ? (
+        {loading ? (
+          <div className="loading-container">
+            <img src="/loading.gif" alt="Chargement..." style={{ width: "50px" }} />
+          </div>
+        ) : itemsInProgress.length > 0 ? (
           itemsInProgress.map((item, index) => (
             <div className="inProgressCard" key={index}>
               <div className="inProgressCardImage">

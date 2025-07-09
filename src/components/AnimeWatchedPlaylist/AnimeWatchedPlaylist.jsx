@@ -8,18 +8,36 @@ function AnimeWatchedPlaylist() {
   const animesPerPage = 5;
   const maxPageWindow = 5;
 
-  const loadItemsFromStorage = () => {
-    const storedItems = JSON.parse(localStorage.getItem('ItemsWatched')) || [];
-    const animesOnly = storedItems.filter(item => item.type === 'anime');
-    setItemsWatched(animesOnly);
+  const fetchItemsFromAPI = async () => {
+    const uuid = localStorage.getItem('watchlist_uuid');
+    if (!uuid) return;
+
+    try {
+      const response = await fetch('http://localhost:8000/api/watchlist', {
+        method: 'GET',
+        headers: {
+          'X-User-UUID': uuid
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error("Erreur lors du chargement des films");
+      }
+
+      const data = await response.json();
+      const moviesOnly = data.filter(item => item.type === 'anime' && item.statut === 'watched');
+      setItemsWatched(moviesOnly);
+    } catch (error) {
+      console.error('Erreur API :', error);
+    }
   };
 
   useEffect(() => {
-    loadItemsFromStorage();
+    fetchItemsFromAPI();
   }, []);
 
   const handleAnimeAdded = () => {
-    loadItemsFromStorage();
+    fetchItemsFromAPI();
   };
 
   const handleRemoveAnime = (name) => {
@@ -42,7 +60,7 @@ function AnimeWatchedPlaylist() {
 
   return (
     <>
-    <AnimeSearchBar storageKey="ItemsWatched" onAnimeAdded={handleAnimeAdded}/>
+    <AnimeSearchBar onAnimeAdded={handleAnimeAdded} statut="watched"/>
     {currentAnimes.length > 0 ? (
         currentAnimes.map((anime) => (
           <div className="anime-item" key={anime.name}>

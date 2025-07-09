@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
 import useSeriesSearch from "../../hooks/useSeriesSearch"; 
 import './SeriesSearchBar.css';
-import { logUserAction } from '../../utils/logUserAction';
 
-function SeriesSearchBar({ storageKey = "ItemsToSee", onSeriesAdded }) {
+function SeriesSearchBar({ onSeriesAdded, statut }) {
   const [query, setQuery] = useState('');
   const { results, loading, error } = useSeriesSearch(query);
   const [isBoxVisible, setIsBoxVisible] = useState(false);
 
-  const handleAddToLocalStorage = (serie) => {
-    const storedSeries = JSON.parse(localStorage.getItem(storageKey)) || [];
+  const handleAddToDatabase = (serie) => {
     const newSeries = {
       imdb_id: serie.imdbID,
       name: serie.title,
@@ -19,19 +17,35 @@ function SeriesSearchBar({ storageKey = "ItemsToSee", onSeriesAdded }) {
       episode: '1', 
       season: '0',
       total_episodes: 1,
+      statut: statut || 'tosee'
     };
 
-    // éviter les doublons
-    if (!storedSeries.some(item => item.imdb_id === newSeries.imdb_id)) {
-      localStorage.setItem(storageKey, JSON.stringify([...storedSeries, newSeries]));
-      if (onSeriesAdded) onSeriesAdded();
-    }
+      const uuid = localStorage.getItem('watchlist_uuid');
+      if (!uuid) {
+        console.error("UUID non trouvé dans le localStorage");
+        return;
+      }
 
-    console.log('série ajouté dans ma liste à voir !');
-    logUserAction('ADD_SERIE');
-    
-    setIsBoxVisible(false);
-  };
+      fetch('http://localhost:8000/api/watchlist', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-User-UUID': uuid
+        },
+        body: JSON.stringify(newSeries)
+      })
+        .then(res => {
+          if (!res.ok) throw new Error("Erreur lors de l'enregistrement en base");
+          return res.json();
+        })
+        .then(data => {
+          console.log('Ajouté à la base :', data);
+          if (onSeriesAdded) onSeriesAdded(); // recharge la liste
+        })
+        .catch(err => console.error('Erreur API:', err));
+
+      setIsBoxVisible(false);
+    };
 
   const toggleBoxVisibility = () => {
     setIsBoxVisible(!isBoxVisible);
@@ -50,7 +64,7 @@ function SeriesSearchBar({ storageKey = "ItemsToSee", onSeriesAdded }) {
 
           <div className="resultList">
             {results.map((serie) => (
-              <div key={serie.imdbID} className="resultItem" onClick={() => handleAddToLocalStorage(serie)}>
+              <div key={serie.imdbID} className="resultItem" onClick={() => handleAddToDatabase(serie)}>
                 <h3>{serie.title} <span style={{fontWeight: 'normal', color: '#888'}}>({serie.year})</span></h3>
                 {serie.image && <img src={serie.image} alt={serie.title} width="100" />}
               </div>

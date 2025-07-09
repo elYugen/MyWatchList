@@ -6,13 +6,31 @@ function MovieWatched() {
 const [itemsWatched, setItemsWatched] = useState([]);
 
   useEffect(() => {
-    const loadItemsFromStorage = () => {
-      const storedItems = JSON.parse(localStorage.getItem('ItemsWatched')) || [];
-      const moviesOnly = storedItems.filter(item => item.type === 'movie');
-      setItemsWatched(moviesOnly);
-    };
+  const fetchItemsFromAPI = async () => {
+    const uuid = localStorage.getItem('watchlist_uuid');
+    if (!uuid) return;
 
-    loadItemsFromStorage();
+    try {
+      const response = await fetch('http://localhost:8000/api/watchlist', {
+        method: 'GET',
+        headers: {
+          'X-User-UUID': uuid
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error("Erreur lors du chargement des films");
+      }
+
+      const data = await response.json();
+      const movieOnly = data.filter(item => item.type === 'movie' && item.statut === 'inprogress');
+      setItemsWatched(movieOnly);
+    } catch (error) {
+      console.error('Erreur API :', error);
+    }
+  };
+
+    fetchItemsFromAPI();
   }, []);
 
   return (

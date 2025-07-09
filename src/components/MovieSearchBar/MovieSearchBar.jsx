@@ -2,13 +2,12 @@ import React, { useState } from 'react';
 import useMovieSearch from "../../hooks/useMovieSearch"; 
 import './MovieSearchBar.css';
 
-function MovieSearchBar({ storageKey = "ItemsToSee", onMovieAdded }) {
+function MovieSearchBar({ onMovieAdded, statut }) {
   const [query, setQuery] = useState('');
   const { results, loading, error } = useMovieSearch(query);
   const [isBoxVisible, setIsBoxVisible] = useState(false);
 
   const handleAddToLocalStorage = (movie) => {
-    const storedMovies = JSON.parse(localStorage.getItem(storageKey)) || [];
     const newMovie = {
       imdb_id: movie.imdbID,
       name: movie.title,
@@ -17,16 +16,37 @@ function MovieSearchBar({ storageKey = "ItemsToSee", onMovieAdded }) {
       type: 'movie',
       episode: '1', 
       total_episodes: 1,
+      statut: statut || 'tosee'
     };
 
-    // éviter les doublons
-    if (!storedMovies.some(item => item.imdb_id === newMovie.imdb_id)) {
-      localStorage.setItem(storageKey, JSON.stringify([...storedMovies, newMovie]));
-      if (onMovieAdded) onMovieAdded();
-    }
+    //console.log("statut envoyé :", newMovie.statut);
 
-    setIsBoxVisible(false);
-  };
+      const uuid = localStorage.getItem('watchlist_uuid');
+      if (!uuid) {
+        console.error("UUID non trouvé dans le localStorage");
+        return;
+      }
+
+      fetch('http://localhost:8000/api/watchlist', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-User-UUID': uuid
+        },
+        body: JSON.stringify(newMovie)
+      })
+        .then(res => {
+          if (!res.ok) throw new Error("Erreur lors de l'enregistrement en base");
+          return res.json();
+        })
+        .then(data => {
+          console.log('Ajouté à la base :', data);
+          if (onMovieAdded) onMovieAdded(); // recharge la liste
+        })
+        .catch(err => console.error('Erreur API:', err));
+
+      setIsBoxVisible(false);
+    };
 
   const toggleBoxVisibility = () => {
     setIsBoxVisible(!isBoxVisible);

@@ -7,10 +7,28 @@ import AnimeWatched from "../components/AnimeWatched/AnimeWatched";
 function Anime() {
   const [animesToSee, setAnimesToSee] = useState([]);
 
-  const refreshAnimes = () => {
-    const storedItems = JSON.parse(localStorage.getItem('ItemsToSee')) || [];
-    const animesOnly = storedItems.filter(item => item.type === 'anime');
-    setAnimesToSee(animesOnly);
+  const refreshAnimes = async () => {
+    const uuid = localStorage.getItem('watchlist_uuid');
+    if (!uuid) return;
+
+    try {
+      const response = await fetch('http://localhost:8000/api/watchlist', {
+        method: 'GET',
+        headers: {
+          'X-User-UUID': uuid
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error("Erreur lors du chargement des animes");
+      }
+
+      const data = await response.json();
+      const animesOnly = data.filter(item => item.type === 'anime');
+      setAnimesToSee(animesOnly);
+    } catch (error) {
+      console.error('Erreur API :', error);
+    }
   };
 
   useEffect(() => {

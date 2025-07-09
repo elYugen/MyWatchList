@@ -6,10 +6,28 @@ import MovieWatched from "../components/MovieWatched/MovieWatched";
 function Movies() {
   const [moviesToSee, setMovieToSee] = useState([]);
 
-  const refreshMovies = () => {
-    const storedItems = JSON.parse(localStorage.getItem('ItemsToSee')) || [];
-    const moviesOnly = storedItems.filter(item => item.type === 'movie');
-    setMovieToSee(moviesOnly);
+  const refreshMovies = async () => {
+    const uuid = localStorage.getItem('watchlist_uuid');
+    if (!uuid) return;
+
+    try {
+      const response = await fetch('http://localhost:8000/api/watchlist', {
+        method: 'GET',
+        headers: {
+          'X-User-UUID': uuid
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error("Erreur lors du chargement des films");
+      }
+
+      const data = await response.json();
+      const moviesOnly = data.filter(item => item.type === 'movie');
+      setMovieToSee(moviesOnly);
+    } catch (error) {
+      console.error('Erreur API :', error);
+    }
   };
 
   useEffect(() => {

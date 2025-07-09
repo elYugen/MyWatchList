@@ -2,34 +2,50 @@ import React, { useState } from 'react';
 import useAnimeSearch from "../../hooks/useAnimeSearch"
 import './AnimeSearchBar.css';
 
-function AnimeSearchBar({ onAnimeAdded, storageKey }) {
+function AnimeSearchBar({ onAnimeAdded, statut }) {
   const [query, setQuery] = useState('');
   const { results, loading, error } = useAnimeSearch(query);
   const [isBoxVisible, setIsBoxVisible] = useState(false);
 
-  const handleAddToLocalStorage = (anime) => {
-    const storedAnimes = JSON.parse(localStorage.getItem(storageKey)) || [];
-    const newAnime = {
-      mal_id: anime.mal_id,
-      name: anime.title,
-      image: anime.image || 'default-image-url.jpg',
-      total_episodes: anime.episodes || 0,
-      season: '',
-      episode: '1',
-      type: 'anime',
+  const handleAddToDatabase = (anime) => {
+      const newAnime = {
+        mal_id: anime.mal_id,
+        name: anime.title,
+        image: anime.image || 'default-image-url.jpg',
+        total_episodes: anime.episodes || 0,
+        season: '',
+        episode: 1,
+        type: 'anime',
+        statut: statut || 'tosee'
+      };
+
+      const uuid = localStorage.getItem('watchlist_uuid');
+      if (!uuid) {
+        console.error("UUID non trouvé dans le localStorage");
+        return;
+      }
+
+      fetch('http://localhost:8000/api/watchlist', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-User-UUID': uuid
+        },
+        body: JSON.stringify(newAnime)
+      })
+        .then(res => {
+          if (!res.ok) throw new Error("Erreur lors de l'enregistrement en base");
+          return res.json();
+        })
+        .then(data => {
+          console.log('Ajouté à la base :', data);
+          if (onAnimeAdded) onAnimeAdded(); // recharge la liste
+        })
+        .catch(err => console.error('Erreur API:', err));
+
+      setIsBoxVisible(false);
     };
 
-    // pour éviter les doublons
-    if (!storedAnimes.some(item => item.mal_id === newAnime.mal_id)) {
-      localStorage.setItem(storageKey, JSON.stringify([...storedAnimes, newAnime]));
-    }
-
-    setIsBoxVisible(false);
-
-    if (onAnimeAdded) {
-      onAnimeAdded();
-    }
-  };
 
   const toggleBoxVisibility = () => {
     setIsBoxVisible(!isBoxVisible);
@@ -49,7 +65,7 @@ function AnimeSearchBar({ onAnimeAdded, storageKey }) {
 
       <div className="resultList">
         {results.map((anime) => (
-          <div key={anime.mal_id} className="resultItem" onClick={() => handleAddToLocalStorage(anime)}>
+          <div key={anime.mal_id} className="resultItem" onClick={() => handleAddToDatabase(anime)}>
             <h3>{anime.title}</h3>
             <img src={anime.image} alt={anime.title} width="100" />
           </div>

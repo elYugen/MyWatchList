@@ -9,20 +9,36 @@ function SeriesInProgressPlaylist() {
   const seriesPerPage = 5;
   const maxPageWindow = 5;
 
-  const loadItemsFromStorage = () => {
-    const storedItems = JSON.parse(localStorage.getItem('ItemsInProgress')) || [];
-    const seriesOnly = storedItems.filter(item => item.type === 'serie');
-    setItemsInProgress(seriesOnly);
-    logUserAction('LOAD_SERIE_LIST');
+  const fetchItemsFromAPI = async () => {
+    const uuid = localStorage.getItem('watchlist_uuid');
+    if (!uuid) return;
+
+    try {
+      const response = await fetch('http://localhost:8000/api/watchlist', {
+        method: 'GET',
+        headers: {
+          'X-User-UUID': uuid
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error("Erreur lors du chargement des séries");
+      }
+
+      const data = await response.json();
+      const seriesOnly = data.filter(item => item.type === 'serie' && item.statut === 'inprogress');
+      setItemsInProgress(seriesOnly);
+    } catch (error) {
+      console.error('Erreur API :', error);
+    }
   };
 
   useEffect(() => {
-    loadItemsFromStorage();
+    fetchItemsFromAPI();
   }, []);
 
   const handleSeriesAdded = () => {
-    loadItemsFromStorage();
-    
+    fetchItemsFromAPI();
   };
 
   const handleRemoveSeries = (name) => {
@@ -59,7 +75,7 @@ function SeriesInProgressPlaylist() {
   const endPage = Math.min(totalPages, startPage + maxPageWindow - 1);
   return (
     <>
-    <SeriesSearchBar storageKey="ItemsInProgress" onSeriesAdded={handleSeriesAdded}/>
+    <SeriesSearchBar statut="inprogress" onSeriesAdded={handleSeriesAdded} />
     {currentSeries.length > 0 ? (
         currentSeries.map((serie) => (
           <div className="anime-item" key={serie.name}>

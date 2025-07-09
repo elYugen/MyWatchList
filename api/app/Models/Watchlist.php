@@ -20,5 +20,6 @@ class Watchlist extends Model
         'season',
         'episode',
         'total_episodes',
+        'statut'
     ];
 }

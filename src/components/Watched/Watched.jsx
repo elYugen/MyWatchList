@@ -3,12 +3,37 @@ import { Link } from "react-router-dom";
 import './Watched.css';
 
 function Watched() {
-const [itemsWatched, setItemsWatched] = useState([]);
+
+  const [itemsWatched, setItemsWatched] = useState([]);
+  const uuid = localStorage.getItem('watchlist_uuid');
+  const [loading, setLoading] = useState(true); 
 
   useEffect(() => {
-    const storedItems = JSON.parse(localStorage.getItem('ItemsWatched')) || [];
-    setItemsWatched(storedItems); 
-  }, []);
+    if (!uuid) return;
+
+    const fetchData = async () => {
+      try {
+        setLoading(true); 
+
+        const res = await fetch('http://localhost:8000/api/watchlist', {
+          headers: { 'X-User-UUID': uuid }
+        });
+
+        if (!res.ok) throw new Error('Erreur lors de la requête');
+
+        const data = await res.json();
+        const filtered = data.filter(item => item.statut === 'watched');
+
+        setItemsWatched(filtered);
+      } catch (error) {
+        console.error('Erreur API :', error);
+      } finally {
+        setLoading(false); 
+      }
+    };
+
+    fetchData();
+  }, [uuid]);
 
   return (
     <>
@@ -19,7 +44,11 @@ const [itemsWatched, setItemsWatched] = useState([]);
         </div>
       </Link>
       <section className="watched">
-        {itemsWatched.length > 0 ? (
+        {loading ? (
+          <div className="loading-container">
+            <img src="/loading.gif" alt="Chargement..." style={{ width: "50px" }} />
+          </div>
+        ) : itemsWatched.length > 0 ? (
           itemsWatched.map((item, index) => (
             <div className="watchedCard" key={index}>
               <div className="watchedCardImage">

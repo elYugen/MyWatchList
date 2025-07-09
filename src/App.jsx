@@ -22,6 +22,13 @@ import SeriesToSee from "./pages/SeriesToSee";
 
 function App() {
 
+  // génère un uuid aléatoire et le set au localStorage pour le passer à l'api et récupérer/envoyer des données
+  let uuid = localStorage.getItem('watchlist_uuid');
+  if (!uuid) {
+    uuid = crypto.randomUUID();
+    localStorage.setItem('watchlist_uuid', uuid);
+  }
+
   return (
     <>
     <BugTracker />

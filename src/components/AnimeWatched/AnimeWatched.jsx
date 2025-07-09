@@ -6,13 +6,31 @@ function AnimeWatched() {
 const [itemsWatched, setItemsWatched] = useState([]);
 
   useEffect(() => {
-    const loadItemsFromStorage = () => {
-      const storedItems = JSON.parse(localStorage.getItem('ItemsWatched')) || [];
-      const animesOnly = storedItems.filter(item => item.type === 'anime');
-      setItemsWatched(animesOnly);
-    };
+  const fetchItemsFromAPI = async () => {
+    const uuid = localStorage.getItem('watchlist_uuid');
+    if (!uuid) return;
 
-    loadItemsFromStorage();
+    try {
+      const response = await fetch('http://localhost:8000/api/watchlist', {
+        method: 'GET',
+        headers: {
+          'X-User-UUID': uuid
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error("Erreur lors du chargement des animés");
+      }
+
+      const data = await response.json();
+      const animeOnly = data.filter(item => item.type === 'anime' && item.statut === 'watched');
+      setItemsWatched(animeOnly);
+    } catch (error) {
+      console.error('Erreur API :', error);
+    }
+  };
+
+    fetchItemsFromAPI();
   }, []);
 
   return (

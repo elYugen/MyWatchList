@@ -20,7 +20,8 @@ class WatchlistController extends Controller
             'episode' => 'nullable|integer',
             'total_episodes' => 'nullable|integer',
             'imdb_id' => 'nullable',
-            'mal_id' => 'nullable'
+            'mal_id' => 'nullable',
+            'statut' => 'required'
         ]);
 
         $item = Watchlist::create([
@@ -33,7 +34,8 @@ class WatchlistController extends Controller
             'episode' => $request->episode,
             'total_episodes' => $request->total_episodes,
             'imdb_id' => $request->imdb_id,
-            'mal_id' => $request->mal_id
+            'mal_id' => $request->mal_id,
+            'statut' => $request->statut
         ]);
 
         return response()->json([

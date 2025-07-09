@@ -8,25 +8,43 @@ function MovieWatchedPlaylist() {
   const moviesPerPage = 5;
   const maxPageWindow = 5;
 
-  const loadItemsFromStorage = () => {
-    const storedItems = JSON.parse(localStorage.getItem('ItemsWatched')) || [];
-    const moviesOnly = storedItems.filter(item => item.type === 'movie');
-    setItemsWatched(moviesOnly);
+  const fetchItemsFromAPI = async () => {
+    const uuid = localStorage.getItem('watchlist_uuid');
+    if (!uuid) return;
+
+    try {
+      const response = await fetch('http://localhost:8000/api/watchlist', {
+        method: 'GET',
+        headers: {
+          'X-User-UUID': uuid
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error("Erreur lors du chargement des films");
+      }
+
+      const data = await response.json();
+      const moviesOnly = data.filter(item => item.type === 'movie' && item.statut === 'watched');
+      setItemsWatched(moviesOnly);
+    } catch (error) {
+      console.error('Erreur API :', error);
+    }
   };
 
   useEffect(() => {
-    loadItemsFromStorage();
+    fetchItemsFromAPI();
   }, []);
 
   const handleMovieAdded = () => {
-    loadItemsFromStorage();
+    fetchItemsFromAPI();
   };
 
-  const handleRemoveMovie = (name) => {
-    const updatedItems = itemsWatched.filter(item => item.name !== name);
-    setItemsWatched(updatedItems);
-    localStorage.setItem('ItemsWatched', JSON.stringify(updatedItems));
-  };
+  // const handleRemoveMovie = (name) => {
+  //   const updatedItems = itemsWatched.filter(item => item.name !== name);
+  //   setItemsWatched(updatedItems);
+  //   localStorage.setItem('ItemsWatched', JSON.stringify(updatedItems));
+  // };
 
   const indexOfLastMovie = currentPage * moviesPerPage;
   const indexOfFirstMovie = indexOfLastMovie - moviesPerPage;
@@ -42,7 +60,7 @@ function MovieWatchedPlaylist() {
 
   return (
     <>
-    <MovieSearchBar storageKey="ItemsWatched" onMovieAdded={handleMovieAdded}/>
+    <MovieSearchBar statut="watched" onMovieAdded={handleMovieAdded}/>
     {currentMovies.length > 0 ? (
         currentMovies.map((movie) => (
           <div className="anime-item" key={movie.name}>

@@ -6,13 +6,31 @@ function AnimeInProgress() {
 const [itemsInProgress, setItemsInProgress] = useState([]);
 
   useEffect(() => {
-    const loadItemsFromStorage = () => {
-      const storedItems = JSON.parse(localStorage.getItem('ItemsInProgress')) || [];
-      const animesOnly = storedItems.filter(item => item.type === 'anime');
-      setItemsInProgress(animesOnly);
-    };
+  const fetchItemsFromAPI = async () => {
+    const uuid = localStorage.getItem('watchlist_uuid');
+    if (!uuid) return;
 
-    loadItemsFromStorage();
+    try {
+      const response = await fetch('http://localhost:8000/api/watchlist', {
+        method: 'GET',
+        headers: {
+          'X-User-UUID': uuid
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error("Erreur lors du chargement des animés");
+      }
+
+      const data = await response.json();
+      const animeOnly = data.filter(item => item.type === 'anime' && item.statut === 'inprogress');
+      setItemsInProgress(animeOnly);
+    } catch (error) {
+      console.error('Erreur API :', error);
+    }
+  };
+
+    fetchItemsFromAPI();
   }, []);
 
   return (

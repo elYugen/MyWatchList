@@ -7,10 +7,28 @@ import SeriesInProgress from "../components/SeriesInProgress/SeriesInProgress";
 function Series() {
   const [seriesToSee, setSeriesToSee] = useState([]);
 
-  const refreshSeries = () => {
-    const storedItems = JSON.parse(localStorage.getItem('ItemsToSee')) || [];
-    const seriesOnly = storedItems.filter(item => item.type === 'serie');
-    setSeriesToSee(seriesOnly);
+  const refreshSeries = async () => {
+    const uuid = localStorage.getItem('watchlist_uuid');
+    if (!uuid) return;
+
+    try {
+      const response = await fetch('http://localhost:8000/api/watchlist', {
+        method: 'GET',
+        headers: {
+          'X-User-UUID': uuid
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error("Erreur lors du chargement des films");
+      }
+
+      const data = await response.json();
+      const seriesOnly = data.filter(item => item.type === 'serie');
+      setSeriesToSee(seriesOnly);
+    } catch (error) {
+      console.error('Erreur API :', error);
+    }
   };
 
   useEffect(() => {

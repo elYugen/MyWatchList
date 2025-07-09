@@ -5,29 +5,44 @@ import './AnimeRandomPick.css';
 function AnimeRandomPick({ onAdd }) {
   const { anime, loading, error } = useRandomAnime();
 
-  const handleAddToLocalStorage = (anime) => {
-    const storedItems = JSON.parse(localStorage.getItem('ItemsToSee')) || [];
+  const handleAddToDatabase = (anime) => {
+      const newAnime = {
+        mal_id: anime.mal_id,
+        name: anime.title,
+        image: anime.image || 'default-image-url.jpg',
+        total_episodes: anime.episodes || 0,
+        season: '',
+        episode: 1,
+        type: 'anime',
+        statut: 'tosee'
+      };
 
-    const exists = storedItems.some(item => item.mal_id === anime.mal_id && item.type === 'anime');
-    if (exists) {
-      alert("Cet anime est déjà dans la liste !");
-      return;
-    }
+      const uuid = localStorage.getItem('watchlist_uuid');
+      if (!uuid) {
+        console.error("UUID non trouvé dans le localStorage");
+        return;
+      }
 
-    const newAnime = {
-      mal_id: anime.mal_id,
-      name: anime.title,
-      image: anime.image || 'default-image-url.jpg',
-      total_episodes: anime.episodes || 0,
-      season: '',
-      episodes: '1',
-      type: 'anime',
-    };
+      fetch('http://localhost:8000/api/watchlist', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-User-UUID': uuid
+        },
+        body: JSON.stringify(newAnime)
+      })
+        .then(res => {
+          if (!res.ok) throw new Error("Erreur lors de l'enregistrement en base");
+          return res.json();
+        })
+        .then(data => {
+          console.log('Ajouté à la base :', data);
+          alert('Animé ajouté dans la playlist A voir');
+          if (onAdd) onAdd(); 
+        })
+        .catch(err => console.error('Erreur API:', err));
 
-    localStorage.setItem('ItemsToSee', JSON.stringify([...storedItems, newAnime]));
-    alert(`${anime.title} a été ajouté à la liste "À voir" !`);
 
-    if (onAdd) onAdd(); 
   };
 
   return (
@@ -44,7 +59,7 @@ function AnimeRandomPick({ onAdd }) {
               <div className="randomPickInfoTitle">
                 <h2>{anime.title}</h2>
                 {/* <p>{truncateText(anime.synopsis, 100)}</p> */}
-                <button className="btn" onClick={() => handleAddToLocalStorage(anime)}>À regarder</button>
+                <button className="btn" onClick={() => handleAddToDatabase(anime)}>À regarder</button>
               </div>
             </div>
           </div>

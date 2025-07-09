@@ -6,13 +6,31 @@ function SeriesWatched() {
 const [itemsWatched, setItemsWatched] = useState([]);
 
   useEffect(() => {
-    const loadItemsFromStorage = () => {
-      const storedItems = JSON.parse(localStorage.getItem('ItemsWatched')) || [];
-      const seriesOnly = storedItems.filter(item => item.type === 'serie');
-      setItemsWatched(seriesOnly);
-    };
+  const fetchItemsFromAPI = async () => {
+    const uuid = localStorage.getItem('watchlist_uuid');
+    if (!uuid) return;
 
-    loadItemsFromStorage();
+    try {
+      const response = await fetch('http://localhost:8000/api/watchlist', {
+        method: 'GET',
+        headers: {
+          'X-User-UUID': uuid
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error("Erreur lors du chargement des séries");
+      }
+
+      const data = await response.json();
+      const seriesOnly = data.filter(item => item.type === 'serie' && item.statut === 'watched');
+      setItemsWatched(seriesOnly);
+    } catch (error) {
+      console.error('Erreur API :', error);
+    }
+  };
+
+    fetchItemsFromAPI();
   }, []);
 
   return (

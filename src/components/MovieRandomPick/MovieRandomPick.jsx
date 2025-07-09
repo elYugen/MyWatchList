@@ -5,32 +5,48 @@ import './MovieRandomPick.css';
 function MovieRandomPick({ onAdd }) {
   const { movie, loading, error } = useRandomMovie();
 
-  const handleAddToLocalStorage = (movie) => {
-    const storedItems = JSON.parse(localStorage.getItem('ItemsToSee')) || [];
-
-    const exists = storedItems.some(item => item.imdb_id === movie.imdb_id && item.type === 'movie');
-    if (exists) {
-      alert("Ce film est déjà dans la liste !");
-      return;
-    }
-
-    const newMovie = {
-      imdb_id: movie.imdb_id,
-      name: movie.title,
-      image: movie.image || 'default-image-url.jpg',
-      total_episodes: 1,
-      season: '',
-      episode: '1',
-      type: 'movie',
-      release_date: movie.release_date,
-      synopsis: movie.synopsis,
-    };
-
-    localStorage.setItem('ItemsToSee', JSON.stringify([...storedItems, newMovie]));
-    alert(`${movie.title} a été ajouté à la liste "À voir" !`);
-
-    if (onAdd) onAdd(); 
+const handleAddToDatabase = (movie) => {
+  const newMovie = {
+    imdb_id: movie.imdb_id,
+    name: movie.title,
+    image: movie.image || 'default-image-url.jpg',
+    total_episodes: 1,
+    season: '',
+    episode: 1,
+    type: 'movie',
+    release_date: movie.release_date,
+    synopsis: movie.synopsis,
+    statut: 'tosee'
   };
+
+  const uuid = localStorage.getItem('watchlist_uuid');
+  if (!uuid) {
+    console.error("UUID non trouvé dans le localStorage");
+    return;
+  }
+
+  fetch('http://localhost:8000/api/watchlist', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-User-UUID': uuid
+    },
+    body: JSON.stringify(newMovie)
+  })
+    .then(res => {
+      if (!res.ok) throw new Error("Erreur lors de l'enregistrement en base");
+      return res.json();
+    })
+    .then(data => {
+      console.log('Ajouté à la base :', data);
+      alert(`${movie.title} a été ajouté à la playlist "À voir" !`);
+      if (onAdd) onAdd(); // recharge la liste
+    })
+    .catch(err => {
+      console.error('Erreur API:', err);
+      alert("Erreur lors de l'ajout du film !");
+    });
+};
 
   return (
     <>
@@ -47,7 +63,7 @@ function MovieRandomPick({ onAdd }) {
               <div className="randomPickInfoTitle">
                 <h2>{movie.title}</h2>
                 {/* <p>{truncateText(movie.synopsis, 100)}</p> */}
-                <button className="btn" onClick={() => handleAddToLocalStorage(movie)}>À regarder</button>
+                <button className="btn" onClick={() => handleAddToDatabase(movie)}>À regarder</button>
               </div>
             </div>
           </div>
