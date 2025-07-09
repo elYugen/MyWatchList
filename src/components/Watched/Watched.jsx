@@ -15,7 +15,7 @@ function Watched() {
       try {
         setLoading(true); 
 
-        const res = await fetch('http://localhost:8000/api/watchlist', {
+        const res = await fetch('https://watchlist.lleroy.fr/api/watchlist', {
           headers: { 'X-User-UUID': uuid }
         });
 

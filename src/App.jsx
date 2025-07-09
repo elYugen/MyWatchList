@@ -36,7 +36,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
-          <Route path="*" element={<NoPage />} />
+          {/* <Route path="*" element={<NoPage />} /> */}
           <Route path="settings" element={<Settings />} />
           <Route path="anime" element={<Animes />} />
           <Route path="anime/tosee" element={<AnimesToSee />} />

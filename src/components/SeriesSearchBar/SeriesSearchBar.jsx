@@ -26,7 +26,7 @@ function SeriesSearchBar({ onSeriesAdded, statut }) {
         return;
       }
 
-      fetch('http://localhost:8000/api/watchlist', {
+      fetch('https://watchlist.lleroy.fr/api/watchlist', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

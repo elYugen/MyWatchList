@@ -12,7 +12,7 @@ function Anime() {
     if (!uuid) return;
 
     try {
-      const response = await fetch('http://localhost:8000/api/watchlist', {
+      const response = await fetch('https://watchlist.lleroy.fr/api/watchlist', {
         method: 'GET',
         headers: {
           'X-User-UUID': uuid
