@@ -2,6 +2,8 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import './assets/css/styles.css'
 
+import BugTracker from "./utils/BugTrackers";
+
 import Layout from "./pages/Layout";
 import Home from "./pages/Home";
 import NoPage from "./pages/NoPage";
@@ -22,6 +24,7 @@ function App() {
 
   return (
     <>
+    <BugTracker />
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Layout />}>

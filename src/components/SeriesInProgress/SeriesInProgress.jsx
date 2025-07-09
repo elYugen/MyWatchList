@@ -33,9 +33,9 @@ const [itemsInProgress, setItemsInProgress] = useState([]);
               <div className="inProgressTitle">
                 <p>{serie.name.length > 17 ? `${serie.name.slice(0, 17)}...` : serie.name}</p>
               </div>
-              <div className="inProgressRecap">
+              {/* <div className="inProgressRecap">
                 <p>Épisode {serie.episode}</p>
-              </div>
+              </div> */}
             </div>
           ))
         ) : (

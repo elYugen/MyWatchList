@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import useSeriesSearch from "../../hooks/useSeriesSearch"; 
 import './SeriesSearchBar.css';
+import { logUserAction } from '../../utils/logUserAction';
 
 function SeriesSearchBar({ storageKey = "ItemsToSee", onSeriesAdded }) {
   const [query, setQuery] = useState('');
@@ -26,6 +27,9 @@ function SeriesSearchBar({ storageKey = "ItemsToSee", onSeriesAdded }) {
       if (onSeriesAdded) onSeriesAdded();
     }
 
+    console.log('série ajouté dans ma liste à voir !');
+    logUserAction('ADD_SERIE');
+    
     setIsBoxVisible(false);
   };
 

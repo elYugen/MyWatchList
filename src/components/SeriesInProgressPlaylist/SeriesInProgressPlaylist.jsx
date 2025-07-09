@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import SeriesSearchBar from '../SeriesSearchBar/SeriesSearchBar';
 import './SeriesInProgressPlaylist.css';
+import { logUserAction } from '../../utils/logUserAction';
 
 function SeriesInProgressPlaylist() {
   const [itemsInProgress, setItemsInProgress] = useState([]);
@@ -12,6 +13,7 @@ function SeriesInProgressPlaylist() {
     const storedItems = JSON.parse(localStorage.getItem('ItemsInProgress')) || [];
     const seriesOnly = storedItems.filter(item => item.type === 'serie');
     setItemsInProgress(seriesOnly);
+    logUserAction('LOAD_SERIE_LIST');
   };
 
   useEffect(() => {
@@ -20,29 +22,28 @@ function SeriesInProgressPlaylist() {
 
   const handleSeriesAdded = () => {
     loadItemsFromStorage();
+    
   };
 
   const handleRemoveSeries = (name) => {
     const updatedSeries = itemsInProgress.filter((serie) => serie.name !== name);
     setItemsInProgress(updatedSeries);
     localStorage.setItem('ItemsInProgress', JSON.stringify(updatedSeries));
+    logUserAction('REMOVE_SERIE', { name });
   };
 
   const handleMarkAsSeen = (serie) => {
     const watchedSeries = JSON.parse(localStorage.getItem('ItemsWatched')) || [];
     localStorage.setItem('ItemsWatched', JSON.stringify([...watchedSeries, serie]));
     handleRemoveSeries(serie.name);
+    logUserAction('MOVE_SERIE', { serie });
   };
 
-  const handleEpisodeChange = (name, episode) => {
-    const updatedSeries = itemsInProgress.map((serie) => {
-      if (serie.name === name) {
-        return { ...serie, episode };
-      }
-      return serie;
-    });
-    setItemsInProgress(updatedSeries);
-    localStorage.setItem('ItemsInProgress', JSON.stringify(updatedSeries));
+  const handleMarkInProgress = (name) => {
+    localStorage.setItem('ItemsInProgress', JSON.stringify([...watchedItems, serie]));
+    handleRemoveMovie(serie.name);
+    console.log('série ajouter à la playlist en cours');
+    
   };
 
   const indexOfLastSeries = currentPage * seriesPerPage;
@@ -69,7 +70,7 @@ function SeriesInProgressPlaylist() {
                 <button className="trash-button" onClick={() => handleRemoveSeries(serie.name)}>
                   <i className="bi bi-trash"></i>
                 </button>
-                <button className="seen-button" onClick={() => handleMarkAsSeen(serie)}>
+                <button className="seen-button" onClick={() => handleMarkInProgress(serie)}>
                   <i className="bi bi-check"></i>
                 </button>
               </div>
