@@ -12,40 +12,40 @@ function SeriesRandomPick({ onAdd }) {
       name: serie.title,
       image: serie.image || 'default-image-url.jpg',
       total_episodes: 1,
-      season: '0',
-      episode: '1',
+      season: 0,
+      episode: 1,
       type: 'serie',
       release_date: serie.release_date,
       synopsis: serie.synopsis,
+      statut: 'tosee'
     };
 
-    const uuid = localStorage.getItem('watchlist_uuid');
-    if (!uuid) {
-      console.error("UUID non trouvé dans le localStorage");
-      return;
-    }
+      const uuid = localStorage.getItem('watchlist_uuid');
+      if (!uuid) {
+        console.error("UUID non trouvé dans le localStorage");
+        return;
+      }
 
-  fetch('https://api.watchlist.lleroy.fr/api/watchlist', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-User-UUID': uuid
-    },
-    body: JSON.stringify(newSerie)
-  })
-    .then(res => {
-      if (!res.ok) throw new Error("Erreur lors de l'enregistrement en base");
-      return res.json();
-    })
-    .then(data => {
-      console.log('Ajouté à la base :', data);
-      alert(`${serie.title} a été ajouté à la playlist "À voir" !`);
-      if (onAdd) onAdd(); // recharge la liste
-    })
-    .catch(err => {
-      console.error('Erreur API:', err);
-      alert("Erreur lors de l'ajout du film !");
-    });
+      fetch('http://127.0.0.1:8000/api/watchlist', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-User-UUID': uuid
+        },
+        body: JSON.stringify(newSerie)
+      })
+        .then(res => {
+          if (!res.ok) throw new Error("Erreur lors de l'enregistrement en base");
+          return res.json();
+        })
+        .then(data => {
+          console.log('Ajouté à la base :', data);
+          alert('Série ajouté dans la playlist A voir');
+          if (onAdd) onAdd(); 
+        })
+        .catch(err => console.error('Erreur API:', err));
+
+
   };
 
   return (
