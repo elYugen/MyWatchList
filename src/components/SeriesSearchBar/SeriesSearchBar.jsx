@@ -14,8 +14,8 @@ function SeriesSearchBar({ onSeriesAdded, statut }) {
       image: serie.image || 'default-image-url.jpg',
       year: serie.year,
       type: 'serie',
-      episode: '1', 
-      season: '0',
+      episode: 1, 
+      season: 0,
       total_episodes: 1,
       statut: statut || 'tosee'
     };
