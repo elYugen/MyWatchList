@@ -6,7 +6,7 @@ function SeriesRandomPick({ onAdd }) {
 
   const { series, loading, error } = useRandomSeries();
 
-  const handleAddToLocalStorage = (serie) => {
+  const handleAddToDatabase = (serie) => {
     const newSerie = {
       imdb_id: serie.imdb_id,
       name: serie.title,
