@@ -58,6 +58,21 @@ const handleDelete = () => {
   alert('watchlist_uuid supprimé du localStorage');
 };
 
+// Constante pour recharger la PWA
+const handleReloadPWA = () => {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then(registrations => {
+      for (const registration of registrations) {
+        registration.unregister();
+      }
+      window.location.reload(true);
+      alert('Application rechargée avec succès !');
+    });
+  } else {
+    window.location.reload(true);
+    alert('Application rechargée !');
+  }
+};
 
   // const exportBug = () => {
   //   const data = localStorage.getItem('bugReports') || '[]';
@@ -82,6 +97,10 @@ const handleDelete = () => {
         <li className="settingsOptionsLink" onClick={handleDelete}>
             <p>Supprimer mes données</p>
             <p><i className="bi bi-arrow-right"></i></p>
+        </li>
+        <li className="settingsOptionsLink" onClick={handleReloadPWA}>
+            <p>Recharger l'application</p>
+            <p><i className="bi bi-arrow-clockwise"></i></p>
         </li>
         {/* <hr style={{ width: '100%' }} />
         <li className="settingsOptionsLink" onClick={exportBug}>

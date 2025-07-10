@@ -10,7 +10,7 @@ export default defineConfig({
       includeAssets: ['favicon.png', 'robots.txt', 'apple-touch-icon.png'],
       manifest: {
         name: 'WatchList',
-        short_name: 'AppAnime',
+        short_name: 'WatchList',
         description: 'Gère ta watchlist d’anime et de films',
         theme_color: '#1b1e26',
         background_color: '#1b1e26',
