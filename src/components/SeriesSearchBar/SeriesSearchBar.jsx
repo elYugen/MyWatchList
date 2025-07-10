@@ -9,14 +9,15 @@ function SeriesSearchBar({ onSeriesAdded, statut }) {
 
   const handleAddToDatabase = (serie) => {
     const newSeries = {
-      imdb_id: serie.imdbID,
+      imdb_id: serie.imdb_id,
       name: serie.title,
       image: serie.image || 'default-image-url.jpg',
-      year: serie.year,
-      type: 'serie',
-      episode: 1, 
-      season: 0,
       total_episodes: 1,
+      season: 0,
+      episode: 1,
+      type: 'serie',
+      release_date: serie.release_date,
+      synopsis: serie.synopsis,
       statut: statut || 'tosee'
     };
 
