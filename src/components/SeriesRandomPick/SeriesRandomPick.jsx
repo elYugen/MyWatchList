@@ -63,7 +63,7 @@ function SeriesRandomPick({ onAdd }) {
               <div className="randomPickInfoTitle">
                 <h2>{series.title}</h2>
                 {/* <p>{truncateText(series.synopsis, 100)}</p> */}
-                <button className="btn" onClick={() => handleAddToLocalStorage(series)}>À regarder</button>
+                <button className="btn" onClick={() => handleAddToDatabase(series)}>À regarder</button>
               </div>
             </div>
           </div>
