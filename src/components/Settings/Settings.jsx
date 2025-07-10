@@ -86,7 +86,7 @@ const handleReloadPWA = () => {
   return (
     <>
       <div className="settingsOptions">
-        <li className="settingsOptionsLink">
+        <li className="settingsOptionsLink" onClick={handleImport}>
             <p>Importer des données existantes</p>
             <p><i className="bi bi-arrow-right"></i></p>
         </li>
