@@ -5,7 +5,7 @@ import './ToSee.css';
 function ToSee({ tosee }) {
   return (
     <>
-      <Link to="tosee">
+      <Link to="#">
         <div className="categoriesTitle">
           <h3>À voir</h3>
           <h3><i className="bi bi-arrow-right"></i></h3>
