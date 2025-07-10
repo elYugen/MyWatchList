@@ -41,7 +41,7 @@ function Home() {
       <RandomPick onAdd={refreshToSee}/>
       <div className="container">
         <InProgress />
-        <ToSee series={toSee} />
+        <ToSee tosee={toSee} />
         <Watched />
       </div>
       </>
